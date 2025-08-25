@@ -1,0 +1,373 @@
+/* Global styles to match Huntflow's dark theme */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: #f4f5f7;
+  color: #333;
+  margin: 20px;
+}
+
+.main-content-h1-text,
+.main-content-p-description {
+  text-align: center;
+}
+
+.sidebar {
+  width: 320px;
+  background: #1d1d1d; /* Dark background */
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin: 20px auto;
+}
+
+/* === СТИЛИ ДЛЯ ПЛАГИНА ОРГАНИЗАЦИИ МЕНЮ === */
+
+/* Контейнер управления */
+.menu-organizer-controls {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 12px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.menu-organizer-controls h3 {
+  margin: 0 0 12px 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.menu-organizer-controls button {
+  background: #22bbd2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  transition: background 0.2s;
+  font-weight: 500;
+}
+
+.menu-organizer-controls button:hover {
+  background: #1a9bb0;
+}
+
+.menu-organizer-controls button:active {
+  background: #158a9c;
+}
+
+/* Кнопка добавления категории */
+.menu-organizer-add-btn {
+  background: #22bbd2;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 8px 0 16px 0;
+  width: 100%;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(34, 187, 210, 0.2);
+}
+
+.menu-organizer-add-btn:hover {
+  background: #1a9bb0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(34, 187, 210, 0.3);
+}
+
+.menu-organizer-add-btn:active {
+  background: #158a9c;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(34, 187, 210, 0.2);
+}
+
+/* Категории */
+.category {
+  margin: 10px 0;
+  border: 1px solid #444;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1a1a1a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.category-header {
+  background: #333;
+  color: #fff;
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.category-header:hover {
+  background: #444;
+}
+
+.category-header .controls {
+  display: flex;
+  gap: 4px;
+}
+
+.category-header button {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.category-header button:hover {
+  background: #555;
+  color: #fff;
+}
+
+.category-body {
+  min-height: 32px;
+  padding: 12px;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+}
+
+.category-body.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-style: italic;
+  font-size: 12px;
+  padding: 16px 8px;
+}
+
+.active-vacancy {
+  background: rgba(255, 200, 0, 0.15);
+  border: 1px solid #ffc800;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(255, 200, 0, 0.7);
+}
+
+/* Вакансии */
+.sidebar-vacancy {
+  display: block;
+  padding: 10px 12px;
+  background: #222;
+  color: #fff;
+  border-radius: 10px;
+  margin: 4px 0;
+  text-decoration: none;
+  cursor: grab;
+  transition: all 0.2s;
+  position: relative;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-vacancy:hover {
+  background: #333;
+  border-color: #22bbd2;
+}
+
+.sidebar-vacancy:active {
+  cursor: grabbing;
+}
+
+.sidebar-vacancy .vacancy-controls {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.sidebar-vacancy:hover .vacancy-controls {
+  opacity: 1;
+}
+
+.sidebar-vacancy .vacancy-controls button {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.sidebar-vacancy .vacancy-controls button:hover {
+  background: #555;
+  color: #fff;
+}
+
+.menu-organizer-refresh-btn {
+  display: block;
+  margin: 6px 0 10px;
+}
+
+/* Drag and drop эффекты */
+.menu-organizer-drag-over {
+  background: #22bbd2 !important;
+  color: #fff !important;
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(34, 187, 210, 0.4);
+}
+
+.menu-organizer-dragging {
+  opacity: 0.6;
+  transform: rotate(3deg) scale(0.98);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Без категории */
+.uncategorized-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #444;
+}
+
+.uncategorized-section .category-header {
+  background: #2a2a2a;
+  color: #ccc;
+  border-radius: 12px 12px 0 0;
+}
+
+.uncategorized-section .category-header:hover {
+  background: #3a3a3a;
+}
+
+/* Адаптация под структуру Huntflow */
+[data-qa="vacancy-list"] .menu-organizer-controls {
+  margin: 8px 0;
+  border-radius: 12px;
+}
+
+[data-qa="vacancy-list"] .category {
+  margin: 6px 0;
+  border-radius: 12px;
+}
+
+[data-qa="vacancy-list"] .sidebar-vacancy {
+  margin: 3px 0;
+  border-radius: 10px;
+}
+
+/* Стили для оригинальных элементов Huntflow */
+a[data-qa="sidebar-vacancy-title"] .titleText--sZxcF,
+a[data-qa="sidebar-vacancy-title"] .titleText--CVA7z,
+a[data-qa="sidebar-vacancy-title"] [class*="titleText--"] {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.3;
+  display: block;
+  margin-bottom: 2px;
+}
+
+a[data-qa="sidebar-vacancy-title"] .subtitleText--Zrh4S,
+a[data-qa="sidebar-vacancy-title"] [class*="subtitleText--"] {
+  font-size: 11px;
+  opacity: 0.7;
+  line-height: 1.2;
+  display: block;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.category {
+  animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sidebar-vacancy {
+  animation: slideIn 0.3s ease-out;
+}
+
+.menu-organizer-add-btn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Улучшенные стили для текста вакансий */
+.sidebar-vacancy .titleText--sZxcF,
+.sidebar-vacancy .titleText--CVA7z,
+.sidebar-vacancy [class*="titleText--"] {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.3;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.sidebar-vacancy .subtitleText--Zrh4S,
+.sidebar-vacancy [class*="subtitleText--"] {
+  font-size: 11px;
+  opacity: 0.7;
+  line-height: 1.2;
+  display: block;
+}
+
+/* Стили для иконок приоритета */
+.sidebar-vacancy .icons--Byggd {
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sidebar-vacancy .text--QN1Gf {
+  margin-left: 20px;
+  padding-right: 40px;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+.pauseIcon--Fxd8z {
+  position: relative;
+  top: -1px;
+}
+.statusIcon--yN4ke {
+  opacity: 0.7;
+}
+.icon--oJdBi {
+  display: inline-block;
+  font-style: normal;
+  vertical-align: middle;
+}

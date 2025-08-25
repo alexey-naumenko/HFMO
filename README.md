@@ -180,9 +180,7 @@ huntflow-menu-organizer/
 
 Разработчики:
 Zahar Izmailov: https://github.com/izzzzzi
-
 Alisher Gaffarov: https://github.com/Alik20021223
-
 Идея:
 Alexey Naumenko https://github.com/alexey-naumenko Tg: @ooprizrakoo 
 

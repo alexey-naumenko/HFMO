@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huntflow Menu Organizer - Пример</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Базовые стили для имитации Huntflow */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f5f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .huntflow-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .aside--wUUUe {
+            width: 320px;
+            background: #1d1d1d;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar--snTMi {
+            height: 100%;
+            background: #1d1d1d;
+        }
+
+        .sidebarContent--t0f6w {
+            padding: 16px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #f4f5f7;
+            padding: 20px;
+        }
+
+        .wrapper--AZA93 {
+            margin-bottom: 16px;
+        }
+
+        /* Стили для вакансий */
+        a[data-qa="sidebar-vacancy-title"] {
+            display: block;
+            padding: 10px 12px;
+            background: #2a2a2a;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        a[data-qa="sidebar-vacancy-title"]:hover {
+            background: #333;
+            border-color: #22bbd2;
+        }
+
+        .icons--Byggd {
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: top;
+        }
+
+        .text--QN1Gf {
+            display: inline-block;
+            vertical-align: top;
+            width: calc(100% - 30px);
+        }
+
+        .title--dg32n {
+            margin-bottom: 4px;
+        }
+
+        .titleText--sZxcF,
+        .titleText--CVA7z {
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 1.3;
+            color: #fff;
+        }
+
+        .subtitle--lD9pR {
+            font-size: 11px;
+        }
+
+        .subtitleText--Zrh4S {
+            color: #ccc;
+            font-size: 11px;
+        }
+
+        /* Заголовки секций */
+        .section-header {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 16px 0 8px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="huntflow-container">
+        <aside class="aside--wUUUe">
+            <div class="sidebar--snTMi loaded--Sn2fB" data-qa="sidebar">
+                <div id="sidebar-content" class="g-scrollable sidebarContent--t0f6w">
+                    <div class="wrapper--C61pJ">
+                        <div class="wrapper--neSXH relative--iIb2O">
+
+                            <h2 class="section-header">Мои вакансии</h2>
+
+                            <!-- Контейнер для плагина организации меню -->
+                            <div data-qa="vacancy-list">
+                                <div data-qa="content">
+                                    <div class="wrapper--AZA93">
+                                        <!-- Пример вакансий -->
+                                        <a href="/vacancy/1001" data-qa="sidebar-vacancy-title"
+                                            title="Frontend разработчик React">
+                                            <div class="icons--Byggd">
+                                                <svg width="12" height="12" viewBox="0 0 12 12">
+                                                    <path fill="#ff6b35" d="M2 2h8v8H2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="text--QN1Gf">
+                                                <div class="title--dg32n">
+                                                    <span class="titleText--sZxcF">Frontend разработчик React</span>
+                                                </div>
+                                                <div class="subtitle--lD9pR">
+                                                    <span class="subtitleText--Zrh4S">IT отдел · Москва</span>
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <a href="/vacancy/1002" data-qa="sidebar-vacancy-title"
+                                            title="Backend разработчик Python">
+                                            <div class="icons--Byggd">
+                                                <svg width="12" height="12" viewBox="0 0 12 12">
+                                                    <path fill="#ff6b35" d="M2 2h8v8H2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="text--QN1Gf">
+                                                <div class="title--dg32n">
+                                                    <span class="titleText--CVA7z">Backend разработчик Python</span>
+                                                </div>
+                                                <div class="subtitle--lD9pR">
+                                                    <span class="subtitleText--Zrh4S">Разработка ·
+                                                        Санкт-Петербург</span>
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <a href="/vacancy/1003" data-qa="sidebar-vacancy-title" title="DevOps инженер">
+                                            <div class="icons--Byggd">
+                                                <svg width="12" height="12" viewBox="0 0 12 12">
+                                                    <path fill="#ff6b35" d="M2 2h8v8H2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="text--QN1Gf">
+                                                <div class="title--dg32n">
+                                                    <span class="titleText--sZxcF">DevOps инженер</span>
+                                                </div>
+                                                <div class="subtitle--lD9pR">
+                                                    <span class="subtitleText--Zrh4S">Инфраструктура · Удаленно</span>
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <a href="/vacancy/1004" data-qa="sidebar-vacancy-title" title="UX/UI дизайнер">
+                                            <div class="icons--Byggd">
+                                                <svg width="12" height="12" viewBox="0 0 12 12">
+                                                    <path fill="#ff6b35" d="M2 2h8v8H2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="text--QN1Gf">
+                                                <div class="title--dg32n">
+                                                    <span class="titleText--CVA7z">UX/UI дизайнер</span>
+                                                </div>
+                                                <div class="subtitle--lD9pR">
+                                                    <span class="subtitleText--Zrh4S">Дизайн · Москва</span>
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <a href="/vacancy/1005" data-qa="sidebar-vacancy-title"
+                                            title="Проектный менеджер">
+                                            <div class="icons--Byggd">
+                                                <svg width="12" height="12" viewBox="0 0 12 12">
+                                                    <path fill="#ff6b35" d="M2 2h8v8H2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="text--QN1Gf">
+                                                <div class="title--dg32n">
+                                                    <span class="titleText--sZxcF">Проектный менеджер</span>
+                                                </div>
+                                                <div class="subtitle--lD9pR">
+                                                    <span class="subtitleText--Zrh4S">Управление проектами ·
+                                                        Екатеринбург</span>
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <a href="/vacancy/1006" data-qa="sidebar-vacancy-title" title="QA инженер">
+                                            <div class="icons--Byggd">
+                                                <svg width="12" height="12" viewBox="0 0 12 12">
+                                                    <path fill="#ff6b35" d="M2 2h8v8H2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="text--QN1Gf">
+                                                <div class="title--dg32n">
+                                                    <span class="titleText--CVA7z">QA инженер</span>
+                                                </div>
+                                                <div class="subtitle--lD9pR">
+                                                    <span class="subtitleText--Zrh4S">Тестирование · Новосибирск</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <h1>Huntflow Menu Organizer - Страница для тестирования</h1>
+            <p>Эта страница имитирует структуру Huntflow для тестирования плагина организации меню.</p>
+
+            <h2>Инструкции по использованию:</h2>
+            <ol>
+                <li>Загрузите расширение в режиме разработчика Chrome</li>
+                <li>Плагин автоматически должен активироваться на этой странице</li>
+                <li>В левом сайдбаре появится кнопка "Добавить категорию"</li>
+                <li>Создайте категории и перетаскивайте вакансии между ними</li>
+                <li>Проверьте сохранение состояния при обновлении страницы</li>
+            </ol>
+
+            <h2>Тестируемые функции:</h2>
+            <ul>
+                <li>Создание и удаление категорий</li>
+                <li>Переименование категорий</li>
+                <li>Перетаскивание вакансий между категориями</li>
+                <li>Сворачивание/разворачивание категорий</li>
+                <li>Перемещение в "Без категории"</li>
+                <li>Сохранение состояния в Chrome Storage</li>
+            </ul>
+        </main>
+    </div>
+
+    <script src="content.js"></script>
+</body>
+
+</html>
