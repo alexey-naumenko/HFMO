@@ -4,8 +4,7 @@
 
 **Chrome-расширение для группировки и сортировки вакансий по категориям в Huntflow**
 
-[![CI](https://github.com/alexey-naumenko/HFMO/actions/workflows/ci.yml/badge.svg)](https://github.com/alexey-naumenko/HFMO/actions/workflows/ci.yml)
-[![Release](https://github.com/alexey-naumenko/HFMO/actions/workflows/release.yml/badge.svg)](https://github.com/alexey-naumenko/HFMO/actions/workflows/release.yml)
+[![Pipeline](https://github.com/alexey-naumenko/HFMO/actions/workflows/pipeline.yml/badge.svg)](https://github.com/alexey-naumenko/HFMO/actions/workflows/pipeline.yml)
 [![GitHub release](https://img.shields.io/github/v/release/alexey-naumenko/HFMO?style=flat&colorA=18181B&colorB=28CF8D)](https://github.com/alexey-naumenko/HFMO/releases)
 [![Chrome Manifest V3](https://img.shields.io/badge/Manifest-V3-blue?style=flat&colorA=18181B&colorB=4285F4)](https://developer.chrome.com/docs/extensions/mv3/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=flat&colorA=18181B&colorB=F7DF1E)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
@@ -80,10 +79,10 @@ cd HFMO
 | Действие | Как |
 |----------|-----|
 | Создать категорию | Кнопка **+ Добавить категорию** |
-| Переименовать | Кнопка ✏️ рядом с названием |
-| Удалить | Кнопка 🗑️ (вакансии вернутся в «Без категории») |
+| Переименовать | Иконка карандаша рядом с названием |
+| Удалить | Иконка корзины (вакансии вернутся в «Без категории») |
 | Свернуть/развернуть | Клик по заголовку категории |
-| Синхронизировать | Кнопка **⇅ Синхронизировать** |
+| Синхронизировать | Кнопка **Синхронизировать** |
 
 ### Локальное тестирование
 
@@ -99,13 +98,16 @@ HFMO/
 ├── content.js             # Основная логика расширения
 ├── styles.css             # Стили интерфейса (тёмная тема)
 ├── example.html           # Тестовая страница
+├── package.json           # Зависимости и скрипты
+├── eslint.config.js       # Конфигурация ESLint
+├── __tests__/             # Юнит-тесты (Jest)
+├── CONTRIBUTING.md        # Гайд для контрибьюторов
 ├── LICENSE                # GNU General Public License v3.0
 ├── README.md              # Документация
 └── .github/
     ├── dependabot.yml     # Конфигурация Dependabot
     └── workflows/
-        ├── ci.yml         # CI: линтинг и валидация
-        └── release.yml    # Автоматический релиз
+        └── pipeline.yml   # CI/CD: линтинг, тесты, релиз
 ```
 
 ---
@@ -190,22 +192,7 @@ HFMO/
 
 ## Разработка
 
-### Отладка
-
-1. Откройте консоль разработчика (F12)
-2. Проверьте вкладку **Console** на наличие ошибок
-3. Во вкладке **Application** → Storage проверьте сохранённые данные
-4. Используйте `example.html` для изоляции проблемы
-
-### Conventional Commits
-
-Проект использует [Conventional Commits](https://www.conventionalcommits.org/) для автоматического версионирования:
-
-```
-feat: добавить экспорт категорий        → minor (1.x.0)
-fix: исправить drag & drop в Firefox    → patch (1.0.x)
-feat!: переработать API хранилища       → major (x.0.0)
-```
+Подробнее в [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
