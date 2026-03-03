@@ -173,8 +173,4 @@ HFMO/
 | Разработчик | Alisher Gaffarov | [@Alik20021223](https://github.com/Alik20021223) |
 | Идея и концепция | Alexey Naumenko | [@alexey-naumenko](https://github.com/alexey-naumenko) |
 
----
 
-## Лицензия
-
-[GNU General Public License v3.0](LICENSE)
