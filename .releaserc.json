@@ -1,5 +1,6 @@
 {
   "branches": ["main"],
+  "tagFormat": "v${version}",
   "plugins": [
     [
       "@semantic-release/commit-analyzer",
@@ -47,10 +48,13 @@
     [
       "@semantic-release/github",
       {
+        "successComment": false,
+        "failComment": false,
         "assets": [
           {
             "path": "dist/huntflow-menu-organizer.zip",
-            "label": "huntflow-menu-organizer-v${nextRelease.version}.zip"
+            "name": "HFMO-v${nextRelease.version}.zip",
+            "label": "HFMO-v${nextRelease.version}.zip"
           }
         ]
       }

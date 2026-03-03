@@ -88,24 +88,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: Build extension ZIP
-        run: |
-          mkdir -p dist
-          zip -r dist/huntflow-menu-organizer.zip \
-            manifest.json content.js styles.css LICENSE \
-            -x "*.git*" "*.github*" "example.html" "*.md" "dist/*" \
-               "node_modules/*" "package*.json" "__tests__/*" "eslint.config.js" "coverage/*"
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Install semantic-release
-        run: |
-          npm install -g \
-            semantic-release \
-            @semantic-release/changelog \
-            @semantic-release/git \
-            @semantic-release/github \
-            @semantic-release/exec \
-            conventional-changelog-conventionalcommits
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: huntflow-menu-organizer
+          path: dist
 
       - name: Semantic Release
         run: npx semantic-release
