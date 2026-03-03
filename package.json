@@ -1,0 +1,23 @@
+{
+  "name": "huntflow-menu-organizer",
+  "version": "1.2.0",
+  "private": true,
+  "description": "Группировка и сортировка вакансий по категориям в меню Huntflow.",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "jest --coverage"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "semantic-release": "^24.0.0"
+  }
+}

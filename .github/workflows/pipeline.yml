@@ -1,0 +1,105 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  ci:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # --- Validate ---
+      - name: Check required files
+        run: |
+          for f in manifest.json content.js styles.css; do
+            test -f "$f" || { echo "Missing: $f"; exit 1; }
+            echo "  ✓ $f"
+          done
+
+      - name: Validate manifest.json
+        run: |
+          node -e "
+            const manifest = JSON.parse(require('fs').readFileSync('manifest.json','utf8'));
+            const required = ['manifest_version','name','version','permissions','content_scripts'];
+            const missing = required.filter(k => !(k in manifest));
+            if (missing.length) { console.error('Missing:', missing); process.exit(1); }
+            if (manifest.manifest_version !== 3) { console.error('Expected MV3'); process.exit(1); }
+            console.log('✓ manifest.json valid —', manifest.name, 'v' + manifest.version);
+          "
+
+      - name: Validate JS syntax
+        run: node --check content.js
+
+      # --- Lint ---
+      - name: ESLint
+        run: npm run lint
+
+      # --- Test ---
+      - name: Jest
+        run: npm test
+
+      # --- Build ---
+      - name: Build extension ZIP
+        run: |
+          mkdir -p dist
+          zip -r dist/huntflow-menu-organizer.zip \
+            manifest.json content.js styles.css LICENSE \
+            -x "*.git*" "*.github*" "example.html" "*.md" "dist/*" \
+               "node_modules/*" "package*.json" "__tests__/*" "eslint.config.js" "coverage/*"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: huntflow-menu-organizer
+          path: dist/huntflow-menu-organizer.zip
+
+  release:
+    name: Release
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: huntflow-menu-organizer
+          path: dist
+
+      - name: Semantic Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
