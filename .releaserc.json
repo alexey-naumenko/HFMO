@@ -1,0 +1,59 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          { "type": "feat", "release": "minor" },
+          { "type": "fix", "release": "patch" },
+          { "type": "perf", "release": "patch" },
+          { "type": "refactor", "release": "patch" },
+          { "breaking": true, "release": "major" }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits",
+        "presetConfig": {
+          "types": [
+            { "type": "feat", "section": "Новые возможности" },
+            { "type": "fix", "section": "Исправления" },
+            { "type": "perf", "section": "Производительность" },
+            { "type": "refactor", "section": "Рефакторинг" },
+            { "type": "docs", "section": "Документация" },
+            { "type": "ci", "section": "CI/CD" }
+          ]
+        }
+      }
+    ],
+    "@semantic-release/changelog",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "node -e \"const m=JSON.parse(require('fs').readFileSync('manifest.json','utf8'));m.version='${nextRelease.version}';require('fs').writeFileSync('manifest.json',JSON.stringify(m,null,2)+'\\n')\""
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["CHANGELOG.md", "manifest.json"],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "dist/huntflow-menu-organizer.zip",
+            "label": "huntflow-menu-organizer-v${nextRelease.version}.zip"
+          }
+        ]
+      }
+    ]
+  ]
+}
