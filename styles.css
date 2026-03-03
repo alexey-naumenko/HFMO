@@ -237,6 +237,19 @@ body {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
+/* Drag & drop для категорий */
+.category.menu-organizer-dragging {
+  opacity: 0.5;
+  transform: scale(0.97);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.category.menu-organizer-drag-over-category {
+  border: 2px dashed #22bbd2;
+  background: rgba(34, 187, 210, 0.1);
+  box-shadow: 0 0 12px rgba(34, 187, 210, 0.3);
+}
+
 /* Без категории */
 .uncategorized-section {
   margin-top: 20px;
@@ -370,4 +383,17 @@ svg:not(:root) {
   display: inline-block;
   font-style: normal;
   vertical-align: middle;
+}
+
+/* SVG-иконки Lucide в кнопках */
+.category-header button svg,
+.vacancy-controls button svg {
+  vertical-align: middle;
+  pointer-events: none;
+}
+
+.menu-organizer-add-btn svg,
+.menu-organizer-refresh-btn svg {
+  vertical-align: middle;
+  pointer-events: none;
 }

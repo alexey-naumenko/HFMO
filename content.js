@@ -3,6 +3,20 @@ const MENU_CONTAINER_SELECTOR =
   '[data-qa="vacancy-list"] [data-qa="content"] > div'; // контейнер с вакансиями в "Мои вакансии"
 const VACANCY_SELECTOR = 'a[data-qa="sidebar-vacancy-title"]';
 
+// === ИКОНКИ (Lucide, MIT) ===
+const ICONS = {
+  pencil:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>',
+  trash:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>',
+  eject:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 9-6-6-6 6"/><path d="M12 3v14"/><path d="M5 21h14"/></svg>',
+  refresh:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>',
+  plus:
+    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
+};
+
 // === ГЛОБАЛЬНЫЕ ФУНКЦИИ ===
 let currentOrganizer = null;
 
@@ -45,8 +59,11 @@ function getVacancyData(a) {
     iconHTML = iconNode.outerHTML;
   }
 
+  const vacIdMatch = href.match(/\/vacancy\/(\d+)/);
+  const id = vacIdMatch ? vacIdMatch[1] : href;
+
   return {
-    id: href,
+    id,
     text: title,
     subtitle: subtitle,
     href: href,
@@ -154,7 +171,7 @@ class HuntflowMenuOrganizer {
     controls.className = "controls";
 
     const renameBtn = document.createElement("button");
-    renameBtn.textContent = "✏️";
+    renameBtn.innerHTML = ICONS.pencil;
     renameBtn.onclick = (e) => {
       e.stopPropagation();
       const newName = prompt("Новое имя категории:", category.name);
@@ -166,7 +183,7 @@ class HuntflowMenuOrganizer {
     };
 
     const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "🗑️";
+    deleteBtn.innerHTML = ICONS.trash;
     deleteBtn.onclick = (e) => {
       e.stopPropagation();
       if (
@@ -192,6 +209,37 @@ class HuntflowMenuOrganizer {
 
     wrapper.appendChild(header);
     wrapper.appendChild(body);
+
+    // Drag & drop для перемещения категорий
+    wrapper.draggable = true;
+    wrapper.ondragstart = (e) => {
+      e.dataTransfer.setData("application/x-category", String(index));
+      wrapper.classList.add("menu-organizer-dragging");
+    };
+    wrapper.ondragend = () => wrapper.classList.remove("menu-organizer-dragging");
+    wrapper.addEventListener("dragover", (e) => {
+      // Обрабатываем только перетаскивание категорий
+      if (!e.dataTransfer.types.includes("application/x-category")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      wrapper.classList.add("menu-organizer-drag-over-category");
+    });
+    wrapper.addEventListener("dragleave", (e) => {
+      // Убираем подсветку только при выходе за пределы wrapper
+      if (!wrapper.contains(e.relatedTarget)) {
+        wrapper.classList.remove("menu-organizer-drag-over-category");
+      }
+    });
+    wrapper.addEventListener("drop", (e) => {
+      if (!e.dataTransfer.types.includes("application/x-category")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      wrapper.classList.remove("menu-organizer-drag-over-category");
+      const fromIdx = parseInt(e.dataTransfer.getData("application/x-category"), 10);
+      if (fromIdx !== index) {
+        this.moveCategory(fromIdx, index);
+      }
+    });
 
     return wrapper;
   }
@@ -305,7 +353,7 @@ class HuntflowMenuOrganizer {
     controlsDiv.className = "vacancy-controls";
 
     const removeBtn = document.createElement("button");
-    removeBtn.textContent = "⏏️";
+    removeBtn.innerHTML = ICONS.eject;
     removeBtn.title = 'Переместить в "Без категории"';
     removeBtn.onclick = (e) => {
       e.preventDefault();
@@ -362,6 +410,23 @@ class HuntflowMenuOrganizer {
 
     const vac = this.structure[catIdx].vacancies.splice(vIdx, 1)[0];
     this.structure[targetCatIdx].vacancies.splice(targetVIdx, 0, vac);
+    this.saveStructure();
+    this.renderMenu();
+  }
+
+  moveCategory(fromIdx, toIdx) {
+    const [cat] = this.structure.splice(fromIdx, 1);
+    this.structure.splice(toIdx, 0, cat);
+    this.saveStructure();
+    this.renderMenu();
+  }
+
+  moveVacancy(fromCatIdx, fromVIdx, toCatIdx, toVIdx) {
+    const vac = this.structure[fromCatIdx].vacancies.splice(fromVIdx, 1)[0];
+    if (fromCatIdx === toCatIdx && fromVIdx < toVIdx) {
+      toVIdx--;
+    }
+    this.structure[toCatIdx].vacancies.splice(toVIdx, 0, vac);
     this.saveStructure();
     this.renderMenu();
   }
@@ -429,7 +494,7 @@ class HuntflowMenuOrganizer {
 
   createAddBtn() {
     const addBtn = document.createElement("button");
-    addBtn.textContent = "+ Добавить категорию";
+    addBtn.innerHTML = ICONS.plus + " Добавить категорию";
     addBtn.className = "menu-organizer-add-btn";
     addBtn.type = "button";
     // ключевое — не даём занять всю строку в флекс/грид-контейнере
@@ -444,7 +509,7 @@ class HuntflowMenuOrganizer {
 
   createHardSyncBtn() {
     const btn = document.createElement("button");
-    btn.textContent = "⇅ Синхронизировать";
+    btn.innerHTML = ICONS.refresh + " Синхронизировать";
     btn.className = "menu-organizer-refresh-btn";
     btn.type = "button";
     btn.style.width = "100%";
@@ -606,7 +671,14 @@ class HuntflowMenuOrganizer {
 
 // === ИНИЦИАЛИЗАЦИЯ ===
 // Инициализируем плагин для блока "Мои вакансии"
-currentOrganizer = new HuntflowMenuOrganizer(
-  '[data-qa="vacancy-list"] [data-qa="content"] > div',
-  'a[data-qa="sidebar-vacancy-title"]'
-);
+if (typeof chrome !== "undefined" && chrome.storage) {
+  currentOrganizer = new HuntflowMenuOrganizer(
+    '[data-qa="vacancy-list"] [data-qa="content"] > div',
+    'a[data-qa="sidebar-vacancy-title"]'
+  );
+}
+
+// Экспорт для тестов (в браузере module не определён)
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { getVacancyData, HuntflowMenuOrganizer };
+}
