@@ -94,13 +94,27 @@ class HuntflowMenuOrganizer {
     };
   }
 
+  get _storageKey() {
+    return `menuOrganizerAccordion::${location.origin}`;
+  }
+
   saveStructure() {
-    chrome.storage.local.set({ menuOrganizerAccordion: this.structure });
+    chrome.storage.local.set({ [this._storageKey]: this.structure });
   }
 
   loadStructure(callback) {
-    chrome.storage.local.get("menuOrganizerAccordion", (data) => {
-      callback(data.menuOrganizerAccordion || null);
+    const key = this._storageKey;
+    chrome.storage.local.get([key, "menuOrganizerAccordion"], (data) => {
+      if (data[key]) {
+        callback(data[key]);
+      } else if (data.menuOrganizerAccordion) {
+        // Миграция со старого глобального ключа
+        chrome.storage.local.set({ [key]: data.menuOrganizerAccordion });
+        chrome.storage.local.remove("menuOrganizerAccordion");
+        callback(data.menuOrganizerAccordion);
+      } else {
+        callback(null);
+      }
     });
   }
 
@@ -524,6 +538,15 @@ class HuntflowMenuOrganizer {
     try {
       const freshNodes = this.getSourceNodes();
       const fresh = Array.from(freshNodes).map(getVacancyData);
+
+      // Защита: не удаляем вакансии, если DOM вернул пустой список
+      if (pruneMissing && fresh.length === 0) {
+        console.warn(
+          "[MenuOrganizer] Пропуск очистки: DOM вернул 0 вакансий"
+        );
+        return;
+      }
+
       const freshMap = new Map(fresh.map((v) => [v.id, v]));
 
       // 1) обновляем существующих
@@ -586,7 +609,7 @@ class HuntflowMenuOrganizer {
     const debouncedSync =
       this._debouncedSync ||
       (this._debouncedSync = this._debounce(
-        () => this.refreshFromDOM({ pruneMissing: true }),
+        () => this.refreshFromDOM(),
         500
       ));
 
@@ -601,37 +624,42 @@ class HuntflowMenuOrganizer {
     });
   }
 
-  // Подстраховка против агрессивных стилей страницы
-  injectStyles() {
-    const css = `
-      .menu-organizer-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;}
-      .menu-organizer-add-btn,.menu-organizer-refresh-btn{
-        width:100% !important; display:block; padding:12px 16px;
-        border-radius:16px; border:1px solid rgba(255,255,255,.12); cursor:pointer;
+  _watchForRemoval() {
+    if (this._removalChecker) clearInterval(this._removalChecker);
+    this._removalChecker = setInterval(() => {
+      if (this.pluginContainer && !document.contains(this.pluginContainer)) {
+        clearInterval(this._removalChecker);
+        if (this._observer) {
+          this._observer.disconnect();
+          this._observer = null;
+        }
+        this._debouncedSync = null;
+        this.pluginContainer = null;
+        this.sourceContainer = null;
+        this.menuContainer = null;
+        console.info("[MenuOrganizer] Sidebar удалён, переинициализация...");
+        this.waitForMenuAndInit();
       }
-      .category-body.collapsed { display: none !important; }
-      .category-header { cursor: pointer; user-select: none; }
-      /* Подсветка текущей вакансии */
-      a.sidebar-vacancy.active-vacancy{
-        background: rgba(76, 175, 80, .12);
-        border-left: 3px solid #4caf50;
-        border-radius: 12px;
-      }
-    `;
-    const style = document.createElement("style");
-    style.textContent = css;
-    document.head.appendChild(style);
+    }, 2000);
   }
 
   waitForMenuAndInit() {
+    let attempts = 0;
+    const maxAttempts = 120; // 60 секунд при интервале 500мс
     const interval = setInterval(() => {
+      if (++attempts > maxAttempts) {
+        clearInterval(interval);
+        console.info(
+          "[MenuOrganizer] Sidebar не найден за 60с, остановка поиска"
+        );
+        return;
+      }
+
       const src = document.querySelector(this.menuContainerSelector);
       const hasVacancy = src && src.querySelector(this.vacancySelector);
       if (!src || !hasVacancy) return;
 
       clearInterval(interval);
-
-      this.injectStyles();
 
       // (1) сохраняем исходный контейнер
       this.sourceContainer = src;
@@ -647,11 +675,12 @@ class HuntflowMenuOrganizer {
 
       this.sourceContainer.setAttribute("data-hf-hidden", "true");
       this.sourceContainer.style.display = "none";
-      
+
       // (3) весь рендер пойдёт в pluginContainer
       this.menuContainer = this.pluginContainer;
 
       this.observeSourceDOM();
+      this._watchForRemoval();
 
       this.loadStructure((loaded) => {
         if (loaded) {

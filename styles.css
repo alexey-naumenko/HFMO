@@ -1,46 +1,28 @@
-/* Global styles to match Huntflow's dark theme */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
-  background-color: #f4f5f7;
-  color: #333;
-  margin: 20px;
-}
-
-.main-content-h1-text,
-.main-content-p-description {
-  text-align: center;
-}
-
-.sidebar {
-  width: 320px;
-  background: #1d1d1d; /* Dark background */
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  margin: 20px auto;
-}
-
-/* === СТИЛИ ДЛЯ ПЛАГИНА ОРГАНИЗАЦИИ МЕНЮ === */
+/* === СТИЛИ ДЛЯ ПЛАГИНА ОРГАНИЗАЦИИ МЕНЮ ===
+   Все правила ограничены контейнером .hf-plugin-container,
+   чтобы не влиять на стили страницы-хоста. */
 
 /* Контейнер управления */
-.menu-organizer-controls {
+.hf-plugin-container .menu-organizer-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
   background: #2a2a2a;
   border: 1px solid #444;
   border-radius: 12px;
   padding: 12px;
-  margin: 12px 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.menu-organizer-controls h3 {
+.hf-plugin-container .menu-organizer-controls h3 {
   margin: 0 0 12px 0;
   color: #fff;
   font-size: 14px;
   font-weight: 600;
 }
 
-.menu-organizer-controls button {
+.hf-plugin-container .menu-organizer-controls button {
   background: #22bbd2;
   color: white;
   border: none;
@@ -54,16 +36,16 @@ body {
   font-weight: 500;
 }
 
-.menu-organizer-controls button:hover {
+.hf-plugin-container .menu-organizer-controls button:hover {
   background: #1a9bb0;
 }
 
-.menu-organizer-controls button:active {
+.hf-plugin-container .menu-organizer-controls button:active {
   background: #158a9c;
 }
 
 /* Кнопка добавления категории */
-.menu-organizer-add-btn {
+.hf-plugin-container .menu-organizer-add-btn {
   background: #22bbd2;
   color: white;
   border: none;
@@ -78,20 +60,20 @@ body {
   box-shadow: 0 2px 4px rgba(34, 187, 210, 0.2);
 }
 
-.menu-organizer-add-btn:hover {
+.hf-plugin-container .menu-organizer-add-btn:hover {
   background: #1a9bb0;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(34, 187, 210, 0.3);
 }
 
-.menu-organizer-add-btn:active {
+.hf-plugin-container .menu-organizer-add-btn:active {
   background: #158a9c;
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(34, 187, 210, 0.2);
 }
 
 /* Категории */
-.category {
+.hf-plugin-container .category {
   margin: 10px 0;
   border: 1px solid #444;
   border-radius: 12px;
@@ -100,11 +82,12 @@ body {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.category-header {
+.hf-plugin-container .category-header {
   background: #333;
   color: #fff;
   padding: 12px 16px;
   cursor: pointer;
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -113,16 +96,16 @@ body {
   transition: background 0.2s;
 }
 
-.category-header:hover {
+.hf-plugin-container .category-header:hover {
   background: #444;
 }
 
-.category-header .controls {
+.hf-plugin-container .category-header .controls {
   display: flex;
   gap: 4px;
 }
 
-.category-header button {
+.hf-plugin-container .category-header button {
   background: none;
   border: none;
   color: #ccc;
@@ -133,19 +116,23 @@ body {
   transition: all 0.2s;
 }
 
-.category-header button:hover {
+.hf-plugin-container .category-header button:hover {
   background: #555;
   color: #fff;
 }
 
-.category-body {
+.hf-plugin-container .category-body {
   min-height: 32px;
   padding: 12px;
   background: #1a1a1a;
   border-top: 1px solid #333;
 }
 
-.category-body.empty {
+.hf-plugin-container .category-body.collapsed {
+  display: none !important;
+}
+
+.hf-plugin-container .category-body.empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,15 +142,15 @@ body {
   padding: 16px 8px;
 }
 
-.active-vacancy {
-  background: rgba(255, 200, 0, 0.15);
-  border: 1px solid #ffc800;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(255, 200, 0, 0.7);
+/* Подсветка текущей вакансии */
+.hf-plugin-container a.sidebar-vacancy.active-vacancy {
+  background: rgba(76, 175, 80, 0.12);
+  border-left: 3px solid #4caf50;
+  border-radius: 12px;
 }
 
 /* Вакансии */
-.sidebar-vacancy {
+.hf-plugin-container .sidebar-vacancy {
   display: block;
   padding: 10px 12px;
   background: #222;
@@ -178,16 +165,16 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar-vacancy:hover {
+.hf-plugin-container .sidebar-vacancy:hover {
   background: #333;
   border-color: #22bbd2;
 }
 
-.sidebar-vacancy:active {
+.hf-plugin-container .sidebar-vacancy:active {
   cursor: grabbing;
 }
 
-.sidebar-vacancy .vacancy-controls {
+.hf-plugin-container .sidebar-vacancy .vacancy-controls {
   position: absolute;
   right: 4px;
   top: 50%;
@@ -198,11 +185,11 @@ body {
   transition: opacity 0.2s;
 }
 
-.sidebar-vacancy:hover .vacancy-controls {
+.hf-plugin-container .sidebar-vacancy:hover .vacancy-controls {
   opacity: 1;
 }
 
-.sidebar-vacancy .vacancy-controls button {
+.hf-plugin-container .sidebar-vacancy .vacancy-controls button {
   background: none;
   border: none;
   color: #ccc;
@@ -213,97 +200,77 @@ body {
   transition: all 0.2s;
 }
 
-.sidebar-vacancy .vacancy-controls button:hover {
+.hf-plugin-container .sidebar-vacancy .vacancy-controls button:hover {
   background: #555;
   color: #fff;
 }
 
-.menu-organizer-refresh-btn {
+.hf-plugin-container .menu-organizer-refresh-btn {
   display: block;
   margin: 6px 0 10px;
 }
 
 /* Drag and drop эффекты */
-.menu-organizer-drag-over {
+.hf-plugin-container .menu-organizer-drag-over {
   background: #22bbd2 !important;
   color: #fff !important;
   transform: scale(1.03);
   box-shadow: 0 6px 20px rgba(34, 187, 210, 0.4);
 }
 
-.menu-organizer-dragging {
+.hf-plugin-container .menu-organizer-dragging {
   opacity: 0.6;
   transform: rotate(3deg) scale(0.98);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* Drag & drop для категорий */
-.category.menu-organizer-dragging {
+.hf-plugin-container .category.menu-organizer-dragging {
   opacity: 0.5;
   transform: scale(0.97);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
-.category.menu-organizer-drag-over-category {
+.hf-plugin-container .category.menu-organizer-drag-over-category {
   border: 2px dashed #22bbd2;
   background: rgba(34, 187, 210, 0.1);
   box-shadow: 0 0 12px rgba(34, 187, 210, 0.3);
 }
 
 /* Без категории */
-.uncategorized-section {
+.hf-plugin-container .uncategorized-section {
   margin-top: 20px;
   padding-top: 16px;
   border-top: 1px solid #444;
 }
 
-.uncategorized-section .category-header {
+.hf-plugin-container .uncategorized-section .category-header {
   background: #2a2a2a;
   color: #ccc;
   border-radius: 12px 12px 0 0;
 }
 
-.uncategorized-section .category-header:hover {
+.hf-plugin-container .uncategorized-section .category-header:hover {
   background: #3a3a3a;
 }
 
 /* Адаптация под структуру Huntflow */
-[data-qa="vacancy-list"] .menu-organizer-controls {
+[data-qa="vacancy-list"] .hf-plugin-container .menu-organizer-controls {
   margin: 8px 0;
   border-radius: 12px;
 }
 
-[data-qa="vacancy-list"] .category {
+[data-qa="vacancy-list"] .hf-plugin-container .category {
   margin: 6px 0;
   border-radius: 12px;
 }
 
-[data-qa="vacancy-list"] .sidebar-vacancy {
+[data-qa="vacancy-list"] .hf-plugin-container .sidebar-vacancy {
   margin: 3px 0;
   border-radius: 10px;
 }
 
-/* Стили для оригинальных элементов Huntflow */
-a[data-qa="sidebar-vacancy-title"] .titleText--sZxcF,
-a[data-qa="sidebar-vacancy-title"] .titleText--CVA7z,
-a[data-qa="sidebar-vacancy-title"] [class*="titleText--"] {
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1.3;
-  display: block;
-  margin-bottom: 2px;
-}
-
-a[data-qa="sidebar-vacancy-title"] .subtitleText--Zrh4S,
-a[data-qa="sidebar-vacancy-title"] [class*="subtitleText--"] {
-  font-size: 11px;
-  opacity: 0.7;
-  line-height: 1.2;
-  display: block;
-}
-
 /* Анимации */
-@keyframes fadeIn {
+@keyframes hfmo-fadeIn {
   from {
     opacity: 0;
     transform: translateY(-15px) scale(0.95);
@@ -314,7 +281,7 @@ a[data-qa="sidebar-vacancy-title"] [class*="subtitleText--"] {
   }
 }
 
-@keyframes slideIn {
+@keyframes hfmo-slideIn {
   from {
     opacity: 0;
     transform: translateX(-20px);
@@ -325,22 +292,22 @@ a[data-qa="sidebar-vacancy-title"] [class*="subtitleText--"] {
   }
 }
 
-.category {
-  animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.hf-plugin-container .category {
+  animation: hfmo-fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.sidebar-vacancy {
-  animation: slideIn 0.3s ease-out;
+.hf-plugin-container .sidebar-vacancy {
+  animation: hfmo-slideIn 0.3s ease-out;
 }
 
-.menu-organizer-add-btn {
-  animation: fadeIn 0.5s ease-out;
+.hf-plugin-container .menu-organizer-add-btn {
+  animation: hfmo-fadeIn 0.5s ease-out;
 }
 
-/* Улучшенные стили для текста вакансий */
-.sidebar-vacancy .titleText--sZxcF,
-.sidebar-vacancy .titleText--CVA7z,
-.sidebar-vacancy [class*="titleText--"] {
+/* Стили для текста вакансий */
+.hf-plugin-container .sidebar-vacancy .titleText--sZxcF,
+.hf-plugin-container .sidebar-vacancy .titleText--CVA7z,
+.hf-plugin-container .sidebar-vacancy [class*="titleText--"] {
   font-weight: 500;
   font-size: 13px;
   line-height: 1.3;
@@ -348,8 +315,8 @@ a[data-qa="sidebar-vacancy-title"] [class*="subtitleText--"] {
   margin-bottom: 2px;
 }
 
-.sidebar-vacancy .subtitleText--Zrh4S,
-.sidebar-vacancy [class*="subtitleText--"] {
+.hf-plugin-container .sidebar-vacancy .subtitleText--Zrh4S,
+.hf-plugin-container .sidebar-vacancy [class*="subtitleText--"] {
   font-size: 11px;
   opacity: 0.7;
   line-height: 1.2;
@@ -357,43 +324,46 @@ a[data-qa="sidebar-vacancy-title"] [class*="subtitleText--"] {
 }
 
 /* Стили для иконок приоритета */
-.sidebar-vacancy .icons--Byggd {
+.hf-plugin-container .sidebar-vacancy .icons--Byggd {
   position: absolute;
   left: 4px;
   top: 50%;
   transform: translateY(-50%);
 }
 
-.sidebar-vacancy .text--QN1Gf {
+.hf-plugin-container .sidebar-vacancy .text--QN1Gf {
   margin-left: 20px;
   padding-right: 40px;
 }
 
-svg:not(:root) {
+.hf-plugin-container svg:not(:root) {
   overflow: hidden;
 }
-.pauseIcon--Fxd8z {
+
+.hf-plugin-container .pauseIcon--Fxd8z {
   position: relative;
   top: -1px;
 }
-.statusIcon--yN4ke {
+
+.hf-plugin-container .statusIcon--yN4ke {
   opacity: 0.7;
 }
-.icon--oJdBi {
+
+.hf-plugin-container .icon--oJdBi {
   display: inline-block;
   font-style: normal;
   vertical-align: middle;
 }
 
 /* SVG-иконки Lucide в кнопках */
-.category-header button svg,
-.vacancy-controls button svg {
+.hf-plugin-container .category-header button svg,
+.hf-plugin-container .vacancy-controls button svg {
   vertical-align: middle;
   pointer-events: none;
 }
 
-.menu-organizer-add-btn svg,
-.menu-organizer-refresh-btn svg {
+.hf-plugin-container .menu-organizer-add-btn svg,
+.hf-plugin-container .menu-organizer-refresh-btn svg {
   vertical-align: middle;
   pointer-events: none;
 }

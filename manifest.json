@@ -4,16 +4,17 @@
   "version": "1.3.0",
   "description": "Группировка и сортировка вакансий по категориям в меню Huntflow.",
   "permissions": [
-    "storage",
-    "scripting"
+    "storage"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "*://*.huntflow.ru/*",
+    "*://*.huntflow.io/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "*://*.huntflow.ru/*",
+        "*://*.huntflow.io/*"
       ],
       "js": [
         "content.js"
