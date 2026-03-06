@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/alexey-naumenko/HFMO/compare/v1.3.0...v1.3.1) (2026-03-06)
+
+### Исправления
+
+* безопасность, изоляция и устойчивость расширения ([449593f](https://github.com/alexey-naumenko/HFMO/commit/449593fed68ea44aa4456cbe555573a42afddae3))
+
 ## [1.3.0](https://github.com/alexey-naumenko/HFMO/compare/v1.2.0...v1.3.0) (2026-03-03)
 
 ### Новые возможности
