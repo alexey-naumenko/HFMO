@@ -660,15 +660,27 @@ class HuntflowMenuOrganizer {
     }, 2000);
   }
 
+  _showFallbackBanner() {
+    const target = document.querySelector('[data-qa="vacancy-list"]');
+    if (!target) return;
+    const banner = document.createElement("div");
+    banner.className = "hf-plugin-container";
+    banner.style.cssText = "padding:16px;color:#ccc;font-size:13px;text-align:center";
+    banner.textContent =
+      "HFMO: меню вакансий не найдено. Возможно, структура Huntflow изменилась.";
+    target.prepend(banner);
+  }
+
   waitForMenuAndInit() {
     let attempts = 0;
     const maxAttempts = 120; // 60 секунд при интервале 500мс
     const interval = setInterval(() => {
       if (++attempts > maxAttempts) {
         clearInterval(interval);
-        console.info(
+        console.warn(
           "[MenuOrganizer] Sidebar не найден за 60с, остановка поиска"
         );
+        this._showFallbackBanner();
         return;
       }
 
