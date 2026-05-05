@@ -1,3 +1,9 @@
+## [1.3.2](https://github.com/alexey-naumenko/HFMO/compare/v1.3.1...v1.3.2) (2026-05-05)
+
+### Исправления
+
+* переименовать __tests__ → tests для совместимости с Chrome ([18469f6](https://github.com/alexey-naumenko/HFMO/commit/18469f6c51beb397fb0b060d9fc9d3b405d6117a)), closes [#9](https://github.com/alexey-naumenko/HFMO/issues/9)
+
 ## [1.3.1](https://github.com/alexey-naumenko/HFMO/compare/v1.3.0...v1.3.1) (2026-03-06)
 
 ### Исправления
