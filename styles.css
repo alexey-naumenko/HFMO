@@ -334,6 +334,7 @@
 
 /* Стили для иконок приоритета */
 .hf-plugin-container .sidebar-vacancy .icons--Byggd,
+.hf-plugin-container .sidebar-vacancy [class*="icons--"],
 .hf-plugin-container .sidebar-vacancy .hfmo-icons {
   position: absolute;
   left: 4px;
@@ -342,6 +343,7 @@
 }
 
 .hf-plugin-container .sidebar-vacancy .text--QN1Gf,
+.hf-plugin-container .sidebar-vacancy [class*="text--"],
 .hf-plugin-container .sidebar-vacancy .hfmo-text {
   margin-left: 20px;
   padding-right: 40px;

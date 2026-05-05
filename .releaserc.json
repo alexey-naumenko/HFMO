@@ -35,7 +35,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "node -e \"const v='${nextRelease.version}';for(const f of['manifest.json','package.json']){const o=JSON.parse(require('fs').readFileSync(f,'utf8'));o.version=v;require('fs').writeFileSync(f,JSON.stringify(o,null,2)+'\\n')}\""
+        "prepareCmd": "node -e \"const v='${nextRelease.version}';for(const f of['manifest.json','package.json','package-lock.json']){const o=JSON.parse(require('fs').readFileSync(f,'utf8'));o.version=v;if(o.packages&&o.packages[''])o.packages[''].version=v;require('fs').writeFileSync(f,JSON.stringify(o,null,2)+'\\n')}\""
       }
     ],
     [
