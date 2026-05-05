@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/alexey-naumenko/HFMO/compare/v1.3.5...v1.4.0) (2026-05-05)
+
+### Новые возможности
+
+* санитизация, guards, destroy, стабильные CSS-классы ([7d5bfe5](https://github.com/alexey-naumenko/HFMO/commit/7d5bfe5895d0ec141e1ebc45364739eea8255ef0))
+
 ## [1.3.5](https://github.com/alexey-naumenko/HFMO/compare/v1.3.4...v1.3.5) (2026-05-05)
 
 ### Исправления
