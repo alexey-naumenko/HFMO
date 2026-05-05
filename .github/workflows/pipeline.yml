@@ -65,7 +65,7 @@ jobs:
           zip -r dist/huntflow-menu-organizer.zip \
             manifest.json content.js styles.css LICENSE \
             -x "*.git*" "*.github*" "example.html" "*.md" "dist/*" \
-               "node_modules/*" "package*.json" "__tests__/*" "eslint.config.js" "coverage/*"
+               "node_modules/*" "package*.json" "tests/*" "eslint.config.js" "coverage/*"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
