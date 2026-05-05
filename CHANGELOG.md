@@ -1,3 +1,9 @@
+## [1.3.5](https://github.com/alexey-naumenko/HFMO/compare/v1.3.4...v1.3.5) (2026-05-05)
+
+### Исправления
+
+* user-visible баннер при ненайденном меню Huntflow ([ee82a10](https://github.com/alexey-naumenko/HFMO/commit/ee82a10f1dcdab9ebe750b2053a809fff97a272a))
+
 ## [1.3.4](https://github.com/alexey-naumenko/HFMO/compare/v1.3.3...v1.3.4) (2026-05-05)
 
 ### Исправления
