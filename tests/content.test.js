@@ -8,6 +8,7 @@ global.chrome = {
     local: {
       get: jest.fn((key, cb) => cb({})),
       set: jest.fn(),
+      remove: jest.fn(),
     },
   },
 };
@@ -34,13 +35,24 @@ function createVacancyLink({ href, title, subtitle }) {
 }
 
 // --- Хелпер: создать органайзер с готовой структурой ---
-function createOrganizer(structure) {
+function createOrganizer(structure, { withSource = false } = {}) {
   const org = Object.create(HuntflowMenuOrganizer.prototype);
   org.structure = JSON.parse(JSON.stringify(structure));
   org.menuContainer = document.createElement("div");
+  org.vacancySelector = 'a[data-qa="sidebar-vacancy-title"]';
   org.saveStructure = jest.fn();
   org.renderMenu = jest.fn();
+  if (withSource) {
+    org.sourceContainer = document.createElement("div");
+  }
   return org;
+}
+
+// --- Хелпер: добавить вакансию в sourceContainer ---
+function addSourceVacancy(org, { href, title, subtitle }) {
+  const a = createVacancyLink({ href, title, subtitle });
+  org.sourceContainer.appendChild(a);
+  return a;
 }
 
 // ===== Issue #3: стабильный ID вакансий =====
@@ -281,5 +293,182 @@ describe("moveVacancyToUncategorized", () => {
     const uncat = org.structure.find((c) => c.type === "uncategorized");
     expect(uncat.vacancies).toHaveLength(1);
     expect(uncat.vacancies[0].id).toBe("1");
+  });
+});
+
+// ===== refreshFromDOM =====
+describe("refreshFromDOM — синхронизация с DOM", () => {
+  test("добавляет новые вакансии из DOM в 'Без категории'", () => {
+    const org = createOrganizer(
+      [
+        {
+          type: "category",
+          name: "Dev",
+          vacancies: [{ id: "1", text: "Existing", href: "/my/vacancy/1" }],
+        },
+        { type: "uncategorized", vacancies: [] },
+      ],
+      { withSource: true }
+    );
+    addSourceVacancy(org, {
+      href: "/my/vacancy/1",
+      title: "Existing",
+      subtitle: "",
+    });
+    addSourceVacancy(org, {
+      href: "/my/vacancy/2",
+      title: "New One",
+      subtitle: "",
+    });
+
+    org.refreshFromDOM();
+
+    const uncat = org.structure.find((c) => c.type === "uncategorized");
+    expect(uncat.vacancies).toHaveLength(1);
+    expect(uncat.vacancies[0].id).toBe("2");
+    expect(org.saveStructure).toHaveBeenCalled();
+    expect(org.renderMenu).toHaveBeenCalled();
+  });
+
+  test("обновляет текст существующих вакансий", () => {
+    const org = createOrganizer(
+      [
+        {
+          type: "category",
+          name: "Dev",
+          vacancies: [
+            { id: "1", text: "Old Title", href: "/my/vacancy/1", subtitle: "" },
+          ],
+        },
+        { type: "uncategorized", vacancies: [] },
+      ],
+      { withSource: true }
+    );
+    addSourceVacancy(org, {
+      href: "/my/vacancy/1",
+      title: "New Title",
+      subtitle: "Updated",
+    });
+
+    org.refreshFromDOM();
+
+    expect(org.structure[0].vacancies[0].text).toBe("New Title");
+    expect(org.structure[0].vacancies[0].subtitle).toBe("Updated");
+  });
+
+  test("с pruneMissing удаляет вакансии, отсутствующие в DOM", () => {
+    const org = createOrganizer(
+      [
+        {
+          type: "category",
+          name: "Dev",
+          vacancies: [
+            { id: "1", text: "Stays", href: "/my/vacancy/1" },
+            { id: "99", text: "Removed", href: "/my/vacancy/99" },
+          ],
+        },
+        { type: "uncategorized", vacancies: [] },
+      ],
+      { withSource: true }
+    );
+    addSourceVacancy(org, {
+      href: "/my/vacancy/1",
+      title: "Stays",
+      subtitle: "",
+    });
+
+    org.refreshFromDOM({ pruneMissing: true });
+
+    expect(org.structure[0].vacancies).toHaveLength(1);
+    expect(org.structure[0].vacancies[0].id).toBe("1");
+  });
+
+  test("pruneMissing не удаляет если DOM вернул 0 вакансий", () => {
+    const org = createOrganizer(
+      [
+        {
+          type: "category",
+          name: "Dev",
+          vacancies: [{ id: "1", text: "Keep", href: "/my/vacancy/1" }],
+        },
+        { type: "uncategorized", vacancies: [] },
+      ],
+      { withSource: true }
+    );
+    // sourceContainer пуст — 0 вакансий
+
+    org.refreshFromDOM({ pruneMissing: true });
+
+    expect(org.structure[0].vacancies).toHaveLength(1);
+    expect(org.renderMenu).not.toHaveBeenCalled();
+  });
+
+  test("не падает при отсутствии sourceContainer", () => {
+    const org = createOrganizer([
+      { type: "uncategorized", vacancies: [] },
+    ]);
+    org.sourceContainer = null;
+
+    expect(() => org.refreshFromDOM()).not.toThrow();
+  });
+});
+
+// ===== loadStructure =====
+describe("loadStructure — загрузка и миграция", () => {
+  beforeEach(() => {
+    chrome.storage.local.get.mockClear();
+    chrome.storage.local.set.mockClear();
+  });
+
+  test("загружает структуру по ключу с origin", () => {
+    const saved = [{ type: "uncategorized", vacancies: [{ id: "1" }] }];
+    chrome.storage.local.get.mockImplementation((keys, cb) => {
+      cb({ "menuOrganizerAccordion::https://huntflow.ru": saved });
+    });
+
+    const org = Object.create(HuntflowMenuOrganizer.prototype);
+    // _storageKey — getter, нужен location
+    Object.defineProperty(org, "_storageKey", {
+      get: () => "menuOrganizerAccordion::https://huntflow.ru",
+    });
+
+    let result;
+    org.loadStructure((data) => { result = data; });
+
+    expect(result).toEqual(saved);
+  });
+
+  test("мигрирует со старого глобального ключа", () => {
+    const oldData = [{ type: "uncategorized", vacancies: [{ id: "old" }] }];
+    chrome.storage.local.get.mockImplementation((keys, cb) => {
+      cb({ menuOrganizerAccordion: oldData });
+    });
+
+    const org = Object.create(HuntflowMenuOrganizer.prototype);
+    Object.defineProperty(org, "_storageKey", {
+      get: () => "menuOrganizerAccordion::https://huntflow.ru",
+    });
+
+    let result;
+    org.loadStructure((data) => { result = data; });
+
+    expect(result).toEqual(oldData);
+    expect(chrome.storage.local.set).toHaveBeenCalledWith({
+      "menuOrganizerAccordion::https://huntflow.ru": oldData,
+    });
+  });
+
+  test("возвращает null при отсутствии данных", () => {
+    chrome.storage.local.get.mockImplementation((keys, cb) => cb({}));
+
+    const org = Object.create(HuntflowMenuOrganizer.prototype);
+    Object.defineProperty(org, "_storageKey", {
+      get: () => "menuOrganizerAccordion::https://huntflow.ru",
+    });
+
+    let result = "sentinel";
+    org.loadStructure((data) => { result = data; });
+
+    expect(result).toBeNull();
   });
 });

@@ -39,6 +39,7 @@ module.exports = [
         ...globals.node,
         ...globals.jest,
         document: "readonly",
+        chrome: "readonly",
       },
     },
   },
