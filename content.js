@@ -629,8 +629,7 @@ class HuntflowMenuOrganizer {
         500
       ));
 
-    this._observer = new MutationObserver((mutations) => {
-      // Любые изменения в DOM исходного меню — пробуем синхронизироваться
+    this._observer = new MutationObserver(() => {
       debouncedSync();
     });
 
@@ -718,8 +717,8 @@ class HuntflowMenuOrganizer {
 // Инициализируем плагин для блока "Мои вакансии"
 if (typeof chrome !== "undefined" && chrome.storage) {
   currentOrganizer = new HuntflowMenuOrganizer(
-    '[data-qa="vacancy-list"] [data-qa="content"] > div',
-    'a[data-qa="sidebar-vacancy-title"]'
+    MENU_CONTAINER_SELECTOR,
+    VACANCY_SELECTOR
   );
 }
 
