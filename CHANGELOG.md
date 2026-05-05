@@ -1,3 +1,14 @@
+## [1.3.4](https://github.com/alexey-naumenko/HFMO/compare/v1.3.3...v1.3.4) (2026-05-05)
+
+### Исправления
+
+* fallback-селекторы для иконок при изменении CSS-хешей Huntflow ([b2d09cd](https://github.com/alexey-naumenko/HFMO/commit/b2d09cd64fdcb66952ae1fcc9a9a8b621cb3ecbd))
+* синхронизация версии package.json при релизе ([5e2b4ba](https://github.com/alexey-naumenko/HFMO/commit/5e2b4ba1518df17981239fadc55609abf81d48b1))
+
+### CI/CD
+
+* проверка Chrome-reserved имён директорий в pipeline ([39767c4](https://github.com/alexey-naumenko/HFMO/commit/39767c406af10c97f148b2bf9d68066fe157276e))
+
 ## [1.3.3](https://github.com/alexey-naumenko/HFMO/compare/v1.3.2...v1.3.3) (2026-05-05)
 
 ### Исправления
