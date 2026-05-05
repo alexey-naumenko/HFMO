@@ -99,6 +99,41 @@ describe("getVacancyData — стабильный ID", () => {
     expect(data.text).toBe("Senior Dev");
     expect(data.subtitle).toBe("Remote");
   });
+
+  test("находит иконку по точному CSS-классу", () => {
+    const a = document.createElement("a");
+    a.setAttribute("href", "/my/vacancy/1");
+    const iconsDiv = document.createElement("div");
+    iconsDiv.className = "icons--Byggd";
+    const icon = document.createElement("i");
+    icon.className = "icon--oJdBi";
+    icon.textContent = "★";
+    iconsDiv.appendChild(icon);
+    a.appendChild(iconsDiv);
+    const data = getVacancyData(a);
+    expect(data.icon).toContain("icon--oJdBi");
+  });
+
+  test("находит иконку через wildcard-fallback при изменённых хешах", () => {
+    const a = document.createElement("a");
+    a.setAttribute("href", "/my/vacancy/2");
+    const iconsDiv = document.createElement("div");
+    iconsDiv.className = "icons--Xz9aB";
+    const icon = document.createElement("i");
+    icon.className = "icon--Qw3rT";
+    icon.textContent = "★";
+    iconsDiv.appendChild(icon);
+    a.appendChild(iconsDiv);
+    const data = getVacancyData(a);
+    expect(data.icon).toContain("icon--Qw3rT");
+  });
+
+  test("возвращает пустую иконку если элемент отсутствует", () => {
+    const a = document.createElement("a");
+    a.setAttribute("href", "/my/vacancy/3");
+    const data = getVacancyData(a);
+    expect(data.icon).toBe("");
+  });
 });
 
 // ===== Issue #2: moveVacancy =====

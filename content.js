@@ -52,9 +52,11 @@ function getVacancyData(a) {
   const subtitle = subtitleElement ? subtitleElement.textContent.trim() : "";
   const subtitleHTML = subtitleElement ? subtitleElement.innerHTML : "";
 
-  // Иконка (берём html первого элемента внутри .icons--Byggd)
+  // Иконка — с fallback на wildcard-селекторы если хеши CSS-модулей изменятся
   let iconHTML = "";
-  const iconNode = a.querySelector(".icons--Byggd .icon--oJdBi");
+  const iconNode =
+    a.querySelector(".icons--Byggd .icon--oJdBi") ||
+    a.querySelector('[class*="icons--"] [class*="icon--"]');
   if (iconNode) {
     iconHTML = iconNode.outerHTML;
   }
