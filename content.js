@@ -381,36 +381,52 @@ class HuntflowMenuOrganizer {
     a.appendChild(textDiv);
     a.appendChild(controlsDiv);
 
-    // Drag-and-drop
+    // Drag-and-drop — stopPropagation предотвращает всплытие к body/wrapper категории
     a.ondragstart = (e) => {
+      e.stopPropagation();
       e.dataTransfer.setData("text/plain", JSON.stringify({ catIdx, vIdx }));
       a.classList.add("menu-organizer-dragging");
     };
     a.ondragend = () => a.classList.remove("menu-organizer-dragging");
     a.ondragover = (e) => {
       e.preventDefault();
+      e.stopPropagation();
       a.classList.add("menu-organizer-drag-over");
     };
-    a.ondragleave = () => a.classList.remove("menu-organizer-drag-over");
+    a.ondragleave = (e) => {
+      e.stopPropagation();
+      a.classList.remove("menu-organizer-drag-over");
+    };
     a.ondrop = (e) => {
       e.preventDefault();
+      e.stopPropagation();
       a.classList.remove("menu-organizer-drag-over");
-      const data = JSON.parse(e.dataTransfer.getData("text/plain"));
-      if (data.catIdx !== catIdx || data.vIdx !== vIdx) {
-        moveVacancy(data.catIdx, data.vIdx, catIdx, vIdx);
-      }
+      const raw = e.dataTransfer.getData("text/plain");
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        if (data.catIdx !== catIdx || data.vIdx !== vIdx) {
+          moveVacancy(data.catIdx, data.vIdx, catIdx, vIdx);
+        }
+      } catch { /* невалидные данные — игнорируем */ }
     };
 
     return a;
   }
 
   handleDropVacancy(e, targetCatIdx) {
-    const data = e.dataTransfer.getData("text/plain");
-    if (!data) return;
-    const { catIdx, vIdx } = JSON.parse(data);
+    const raw = e.dataTransfer.getData("text/plain");
+    if (!raw) return;
+    let catIdx, vIdx;
+    try {
+      ({ catIdx, vIdx } = JSON.parse(raw));
+    } catch { return; }
+    if (catIdx == null || vIdx == null) return;
     if (catIdx === targetCatIdx) return;
+    const srcCat = this.structure[catIdx];
+    if (!srcCat || !srcCat.vacancies[vIdx]) return;
 
-    const vac = this.structure[catIdx].vacancies.splice(vIdx, 1)[0];
+    const vac = srcCat.vacancies.splice(vIdx, 1)[0];
     this.structure[targetCatIdx].vacancies.push(vac);
     this.saveStructure();
     this.renderMenu();
