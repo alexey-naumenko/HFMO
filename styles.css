@@ -132,6 +132,14 @@
   display: none !important;
 }
 
+.hf-plugin-container .category-body .empty-state {
+  color: #666;
+  font-style: italic;
+  font-size: 12px;
+  text-align: center;
+  padding: 12px 8px;
+}
+
 .hf-plugin-container .category-body.empty {
   display: flex;
   align-items: center;
@@ -304,10 +312,10 @@
   animation: hfmo-fadeIn 0.5s ease-out;
 }
 
-/* Стили для текста вакансий */
 .hf-plugin-container .sidebar-vacancy .titleText--sZxcF,
 .hf-plugin-container .sidebar-vacancy .titleText--CVA7z,
-.hf-plugin-container .sidebar-vacancy [class*="titleText--"] {
+.hf-plugin-container .sidebar-vacancy [class*="titleText--"],
+.hf-plugin-container .sidebar-vacancy .hfmo-title-text {
   font-weight: 500;
   font-size: 13px;
   line-height: 1.3;
@@ -316,7 +324,8 @@
 }
 
 .hf-plugin-container .sidebar-vacancy .subtitleText--Zrh4S,
-.hf-plugin-container .sidebar-vacancy [class*="subtitleText--"] {
+.hf-plugin-container .sidebar-vacancy [class*="subtitleText--"],
+.hf-plugin-container .sidebar-vacancy .hfmo-subtitle-text {
   font-size: 11px;
   opacity: 0.7;
   line-height: 1.2;
@@ -324,14 +333,16 @@
 }
 
 /* Стили для иконок приоритета */
-.hf-plugin-container .sidebar-vacancy .icons--Byggd {
+.hf-plugin-container .sidebar-vacancy .icons--Byggd,
+.hf-plugin-container .sidebar-vacancy .hfmo-icons {
   position: absolute;
   left: 4px;
   top: 50%;
   transform: translateY(-50%);
 }
 
-.hf-plugin-container .sidebar-vacancy .text--QN1Gf {
+.hf-plugin-container .sidebar-vacancy .text--QN1Gf,
+.hf-plugin-container .sidebar-vacancy .hfmo-text {
   margin-left: 20px;
   padding-right: 40px;
 }

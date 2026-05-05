@@ -13,7 +13,7 @@ global.chrome = {
   },
 };
 
-const { getVacancyData, HuntflowMenuOrganizer } = require("../content");
+const { getVacancyData, HuntflowMenuOrganizer, sanitizeHTML, sanitizeText } = require("../content");
 
 // --- Хелпер: создать DOM-элемент вакансии ---
 function createVacancyLink({ href, title, subtitle }) {
@@ -294,6 +294,7 @@ describe("moveVacancyToUncategorized", () => {
     expect(uncat.vacancies).toHaveLength(1);
     expect(uncat.vacancies[0].id).toBe("1");
   });
+
 });
 
 // ===== refreshFromDOM =====
@@ -470,5 +471,236 @@ describe("loadStructure — загрузка и миграция", () => {
     org.loadStructure((data) => { result = data; });
 
     expect(result).toBeNull();
+  });
+});
+
+// ===== sanitizeHTML =====
+describe("sanitizeHTML — защита от XSS", () => {
+  test("убирает script-теги", () => {
+    const result = sanitizeHTML('<script>alert(1)</script><b>safe</b>');
+    expect(result).toBe('<b>safe</b>');
+  });
+
+  test("убирает on-атрибуты", () => {
+    const result = sanitizeHTML('<div onclick="alert(1)" class="ok">text</div>');
+    expect(result).toBe('<div class="ok">text</div>');
+  });
+
+  test("убирает javascript: в атрибутах", () => {
+    const result = sanitizeHTML('<a href="javascript:alert(1)">link</a>');
+    expect(result).toBe('<a>link</a>');
+  });
+
+  test("убирает iframe, object, embed", () => {
+    const result = sanitizeHTML('<iframe src="evil"></iframe><embed><span>ok</span>');
+    expect(result.trim()).toBe('<span>ok</span>');
+  });
+
+  test("пропускает безопасный SVG и span", () => {
+    const result = sanitizeHTML('<span class="icon">\u2665</span>');
+    expect(result).toBe('<span class="icon">\u2665</span>');
+  });
+
+  test("пропускает пустую строку", () => {
+    expect(sanitizeHTML("")).toBe("");
+  });
+});
+
+// ===== sanitizeText =====
+describe("sanitizeText — валидация текста", () => {
+  test("обрезает HTML-теги", () => {
+    expect(sanitizeText('<b>hello</b>')).toBe('hello');
+  });
+
+  test("обрезает длину до maxLen", () => {
+    expect(sanitizeText('abcdefghij', 5)).toBe('abcde');
+  });
+
+  test("trimит пробелы", () => {
+    expect(sanitizeText('  hello  ')).toBe('hello');
+  });
+
+  test("обрабатывает null/undefined", () => {
+    expect(sanitizeText(null)).toBe('');
+    expect(sanitizeText(undefined)).toBe('');
+  });
+
+  test("по умолчанию лимит 100 символов", () => {
+    const long = 'a'.repeat(150);
+    expect(sanitizeText(long).length).toBe(100);
+  });
+});
+
+// ===== Bounds check =====
+describe("moveVacancy — защита от невалидных индексов", () => {
+  test("не падает при невалидном fromCatIdx", () => {
+    const org = createOrganizer([
+      { type: "category", name: "A", vacancies: [{ id: "1" }] },
+      { type: "uncategorized", vacancies: [] },
+    ]);
+    expect(() => org.moveVacancy(99, 0, 0, 0)).not.toThrow();
+    expect(org.structure[0].vacancies).toHaveLength(1);
+  });
+
+  test("не падает при невалидном toCatIdx", () => {
+    const org = createOrganizer([
+      { type: "category", name: "A", vacancies: [{ id: "1" }] },
+      { type: "uncategorized", vacancies: [] },
+    ]);
+    expect(() => org.moveVacancy(0, 0, 99, 0)).not.toThrow();
+    expect(org.structure[0].vacancies).toHaveLength(1);
+  });
+
+  test("не падает при невалидном fromVIdx", () => {
+    const org = createOrganizer([
+      { type: "category", name: "A", vacancies: [{ id: "1" }] },
+      { type: "uncategorized", vacancies: [] },
+    ]);
+    expect(() => org.moveVacancy(0, 99, 0, 0)).not.toThrow();
+    expect(org.structure[0].vacancies).toHaveLength(1);
+  });
+});
+
+describe("moveCategory — защита от невалидных индексов", () => {
+  test("не падает при невалидном fromIdx", () => {
+    const org = createOrganizer([
+      { type: "category", name: "A", vacancies: [] },
+      { type: "uncategorized", vacancies: [] },
+    ]);
+    expect(() => org.moveCategory(99, 0)).not.toThrow();
+    expect(org.structure).toHaveLength(2);
+  });
+
+  test("не падает при fromIdx === toIdx", () => {
+    const org = createOrganizer([
+      { type: "category", name: "A", vacancies: [{ id: "1" }] },
+      { type: "uncategorized", vacancies: [] },
+    ]);
+    org.moveCategory(0, 0);
+    expect(org.saveStructure).not.toHaveBeenCalled();
+  });
+});
+
+describe("moveVacancyToUncategorized — защита от невалидных индексов", () => {
+  test("не падает при невалидном vIdx и не портит uncategorized", () => {
+    const org = createOrganizer([
+      { type: "category", name: "A", vacancies: [{ id: "1" }] },
+      { type: "uncategorized", vacancies: [] },
+    ]);
+    org.moveVacancyToUncategorized(0, 99);
+    // Источник не должен измениться
+    expect(org.structure[0].vacancies).toHaveLength(1);
+    expect(org.structure[0].vacancies[0].id).toBe("1");
+    // uncategorized НЕ должен получить undefined (молчаливая порча данных)
+    const uncat = org.structure.find((c) => c.type === "uncategorized");
+    expect(uncat.vacancies).toHaveLength(0);
+    expect(uncat.vacancies.every((v) => v != null)).toBe(true);
+  });
+
+  test("не падает при невалидном catIdx", () => {
+    const org = createOrganizer([
+      { type: "category", name: "A", vacancies: [{ id: "1" }] },
+      { type: "uncategorized", vacancies: [] },
+    ]);
+    org.moveVacancyToUncategorized(99, 0);
+    expect(org.structure[0].vacancies).toHaveLength(1);
+  });
+
+  test("не падает если uncategorized отсутствует", () => {
+    const org = createOrganizer([
+      { type: "category", name: "A", vacancies: [{ id: "1" }] },
+    ]);
+    expect(() => org.moveVacancyToUncategorized(0, 0)).not.toThrow();
+    expect(org.structure[0].vacancies).toHaveLength(1);
+  });
+});
+
+// ===== destroy =====
+describe("destroy — очистка ресурсов", () => {
+  test("очищает интервал и observer", () => {
+    const org = Object.create(HuntflowMenuOrganizer.prototype);
+    org.structure = [];
+    org._removalChecker = setInterval(() => {}, 9999);
+    const disconnect = jest.fn();
+    org._observer = { disconnect };
+    org._debouncedSync = () => {};
+    org.pluginContainer = document.createElement("div");
+    org.sourceContainer = document.createElement("div");
+    org.menuContainer = document.createElement("div");
+
+    org.destroy();
+
+    expect(org._removalChecker).toBeNull();
+    expect(disconnect).toHaveBeenCalledTimes(1);
+    expect(org._observer).toBeNull();
+    expect(org._debouncedSync).toBeNull();
+    expect(org.pluginContainer).toBeNull();
+    expect(org.sourceContainer).toBeNull();
+    expect(org.menuContainer).toBeNull();
+  });
+
+  test("безопасен при отсутствии observer и interval", () => {
+    const org = Object.create(HuntflowMenuOrganizer.prototype);
+    org._removalChecker = null;
+    org._observer = null;
+    org._debouncedSync = null;
+    org.pluginContainer = null;
+    org.sourceContainer = null;
+    org.menuContainer = null;
+
+    expect(() => org.destroy()).not.toThrow();
+  });
+});
+
+// ===== Интеграционный XSS-тест: createVacancyElement применяет sanitizeHTML =====
+describe("createVacancyElement — XSS-защита в реальном рендере", () => {
+  test("санитизирует вредоносный subtitleHTML", () => {
+    const org = Object.create(HuntflowMenuOrganizer.prototype);
+    org.structure = [{ type: "uncategorized", vacancies: [] }];
+    org.menuContainer = document.createElement("div");
+    org.isVacancyActive = () => false;
+
+    const vac = {
+      id: "1",
+      text: "Test Vacancy",
+      href: "/vacancy/1",
+      icon: "",
+      subtitle: "",
+      subtitleHTML:
+        '<span class="ok">Safe</span><script>alert("XSS")</script>',
+    };
+
+    const el = org.createVacancyElement(vac, 0, 0);
+    const subtitleSpan = el.querySelector(".hfmo-subtitle-text");
+
+    // script-тег должен быть удалён
+    expect(subtitleSpan.innerHTML).not.toContain("script");
+    // Безопасный span должен остаться
+    expect(subtitleSpan.innerHTML).toContain("Safe");
+    // Не должно быть on*-атрибутов
+    expect(subtitleSpan.innerHTML).not.toContain("onclick");
+    expect(subtitleSpan.innerHTML).not.toContain("onerror");
+  });
+
+  test("не рендерит javascript: ссылки", () => {
+    const org = Object.create(HuntflowMenuOrganizer.prototype);
+    org.structure = [{ type: "uncategorized", vacancies: [] }];
+    org.menuContainer = document.createElement("div");
+    org.isVacancyActive = () => false;
+
+    const vac = {
+      id: "2",
+      text: "Malicious",
+      href: "/vacancy/2",
+      icon: "",
+      subtitle: "",
+      subtitleHTML:
+        '<a href="javascript:alert(1)">Click</a>',
+    };
+
+    const el = org.createVacancyElement(vac, 0, 0);
+    const subtitleSpan = el.querySelector(".hfmo-subtitle-text");
+    // javascript: должен быть удалён из href
+    expect(subtitleSpan.innerHTML).not.toContain("javascript:");
   });
 });

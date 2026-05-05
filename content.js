@@ -17,19 +17,27 @@ const ICONS = {
     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
 };
 
-// === ГЛОБАЛЬНЫЕ ФУНКЦИИ ===
-let currentOrganizer = null;
+// === ГЛОБАЛЬНОЕ СОСТОЯНИЕ ===
+let currentOrganizer = null; // оставляем для отладки из console
 
-function moveVacancy(fromCatIdx, fromVIdx, toCatIdx, toVIdx) {
-  if (currentOrganizer) {
-    currentOrganizer.moveVacancy(fromCatIdx, fromVIdx, toCatIdx, toVIdx);
-  }
+// === УТИЛИТЫ БЕЗОПАСНОСТИ ===
+function sanitizeHTML(html) {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  tmp.querySelectorAll("script,iframe,object,embed,form,input,textarea,select")
+    .forEach((el) => el.remove());
+  tmp.querySelectorAll("*").forEach((el) => {
+    for (const attr of [...el.attributes]) {
+      if (attr.name.startsWith("on") || attr.value.trim().toLowerCase().startsWith("javascript:")) {
+        el.removeAttribute(attr.name);
+      }
+    }
+  });
+  return tmp.innerHTML;
 }
 
-function moveVacancyToUncategorized(catIdx, vIdx) {
-  if (currentOrganizer) {
-    currentOrganizer.moveVacancyToUncategorized(catIdx, vIdx);
-  }
+function sanitizeText(text, maxLen = 100) {
+  return String(text || "").replace(/<[^>]*>/g, "").trim().slice(0, maxLen);
 }
 
 // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
@@ -190,7 +198,7 @@ class HuntflowMenuOrganizer {
     renameBtn.innerHTML = ICONS.pencil;
     renameBtn.onclick = (e) => {
       e.stopPropagation();
-      const newName = prompt("Новое имя категории:", category.name);
+      const newName = sanitizeText(prompt("Новое имя категории:", category.name));
       if (newName) {
         category.name = newName;
         this.saveStructure();
@@ -210,6 +218,7 @@ class HuntflowMenuOrganizer {
         const uncategorized = this.structure.find(
           (c) => c.type === "uncategorized"
         );
+        if (!uncategorized) return;
         uncategorized.vacancies.push(...category.vacancies);
         this.structure.splice(index, 1);
         this.saveStructure();
@@ -317,7 +326,7 @@ class HuntflowMenuOrganizer {
 
     // Левая колонка с иконкой
     const iconsDiv = document.createElement("div");
-    iconsDiv.className = "icons--Byggd";
+    iconsDiv.className = "icons--Byggd hfmo-icons";
     if (vac.icon) {
       iconsDiv.innerHTML = vac.icon;
     } else {
@@ -335,25 +344,25 @@ class HuntflowMenuOrganizer {
 
     // Текстовая часть
     const textDiv = document.createElement("div");
-    textDiv.className = "text--QN1Gf";
+    textDiv.className = "text--QN1Gf hfmo-text";
 
     const titleDiv = document.createElement("div");
-    titleDiv.className = "title--dg32n";
+    titleDiv.className = "title--dg32n hfmo-title";
 
     const titleSpan = document.createElement("span");
-    titleSpan.className = "titleText--sZxcF";
+    titleSpan.className = "titleText--sZxcF hfmo-title-text";
     titleSpan.textContent = vac.text || "";
     titleDiv.appendChild(titleSpan);
 
     const subtitleDiv = document.createElement("div");
-    subtitleDiv.className = "subtitle--lD9pR";
+    subtitleDiv.className = "subtitle--lD9pR hfmo-subtitle";
 
     const subtitleSpan = document.createElement("span");
-    subtitleSpan.className = "subtitleText--Zrh4S";
+    subtitleSpan.className = "subtitleText--Zrh4S hfmo-subtitle-text";
 
     // если ранее сохранили HTML сабтайтла — рендерим его (тогда иконка «паузы» появится)
     if (vac.subtitleHTML) {
-      subtitleSpan.innerHTML = vac.subtitleHTML;
+      subtitleSpan.innerHTML = sanitizeHTML(vac.subtitleHTML);
     } else {
       subtitleSpan.textContent = vac.subtitle || "Описание вакансии";
     }
@@ -374,7 +383,7 @@ class HuntflowMenuOrganizer {
     removeBtn.onclick = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      moveVacancyToUncategorized(catIdx, vIdx);
+      this.moveVacancyToUncategorized(catIdx, vIdx);
     };
     controlsDiv.appendChild(removeBtn);
 
@@ -408,7 +417,7 @@ class HuntflowMenuOrganizer {
       try {
         const data = JSON.parse(raw);
         if (data.catIdx !== catIdx || data.vIdx !== vIdx) {
-          moveVacancy(data.catIdx, data.vIdx, catIdx, vIdx);
+          this.moveVacancy(data.catIdx, data.vIdx, catIdx, vIdx);
         }
       } catch { /* невалидные данные — игнорируем */ }
     };
@@ -434,19 +443,11 @@ class HuntflowMenuOrganizer {
     this.renderMenu();
   }
 
-  handleDropVacancyOnVacancy(e, targetCatIdx, targetVIdx) {
-    const data = e.dataTransfer.getData("text/plain");
-    if (!data) return;
-    const { catIdx, vIdx } = JSON.parse(data);
-    if (catIdx === targetCatIdx && vIdx === targetVIdx) return;
-
-    const vac = this.structure[catIdx].vacancies.splice(vIdx, 1)[0];
-    this.structure[targetCatIdx].vacancies.splice(targetVIdx, 0, vac);
-    this.saveStructure();
-    this.renderMenu();
-  }
 
   moveCategory(fromIdx, toIdx) {
+    if (!this.structure[fromIdx] || fromIdx === toIdx) {
+      return;
+    }
     const [cat] = this.structure.splice(fromIdx, 1);
     this.structure.splice(toIdx, 0, cat);
     this.saveStructure();
@@ -454,6 +455,9 @@ class HuntflowMenuOrganizer {
   }
 
   moveVacancy(fromCatIdx, fromVIdx, toCatIdx, toVIdx) {
+    if (!this.structure[fromCatIdx]?.vacancies?.[fromVIdx] || !this.structure[toCatIdx]) {
+      return;
+    }
     const vac = this.structure[fromCatIdx].vacancies.splice(fromVIdx, 1)[0];
     if (fromCatIdx === toCatIdx && fromVIdx < toVIdx) {
       toVIdx--;
@@ -464,10 +468,14 @@ class HuntflowMenuOrganizer {
   }
 
   moveVacancyToUncategorized(catIdx, vIdx) {
-    const vac = this.structure[catIdx].vacancies.splice(vIdx, 1)[0];
+    if (!this.structure[catIdx]?.vacancies?.[vIdx]) {
+      return;
+    }
     const uncategorized = this.structure.find(
       (c) => c.type === "uncategorized"
     );
+    if (!uncategorized) return;
+    const vac = this.structure[catIdx].vacancies.splice(vIdx, 1)[0];
     uncategorized.vacancies.push(vac);
     this.saveStructure();
     this.renderMenu();
@@ -533,7 +541,7 @@ class HuntflowMenuOrganizer {
     addBtn.style.width = "100%";
     addBtn.style.display = "block";
     addBtn.onclick = () => {
-      const name = prompt("Название категории:");
+      const name = sanitizeText(prompt("Название категории:"));
       if (name) this.addCategory(name);
     };
     return addBtn;
@@ -645,19 +653,26 @@ class HuntflowMenuOrganizer {
     if (this._removalChecker) clearInterval(this._removalChecker);
     this._removalChecker = setInterval(() => {
       if (this.pluginContainer && !document.contains(this.pluginContainer)) {
-        clearInterval(this._removalChecker);
-        if (this._observer) {
-          this._observer.disconnect();
-          this._observer = null;
-        }
-        this._debouncedSync = null;
-        this.pluginContainer = null;
-        this.sourceContainer = null;
-        this.menuContainer = null;
+        this.destroy();
         console.info("[MenuOrganizer] Sidebar удалён, переинициализация...");
         this.waitForMenuAndInit();
       }
     }, 2000);
+  }
+
+  destroy() {
+    if (this._removalChecker) {
+      clearInterval(this._removalChecker);
+      this._removalChecker = null;
+    }
+    if (this._observer) {
+      this._observer.disconnect();
+      this._observer = null;
+    }
+    this._debouncedSync = null;
+    this.pluginContainer = null;
+    this.sourceContainer = null;
+    this.menuContainer = null;
   }
 
   _showFallbackBanner() {
@@ -730,6 +745,7 @@ class HuntflowMenuOrganizer {
 // === ИНИЦИАЛИЗАЦИЯ ===
 // Инициализируем плагин для блока "Мои вакансии"
 if (typeof chrome !== "undefined" && chrome.storage) {
+  // eslint-disable-next-line no-unused-vars
   currentOrganizer = new HuntflowMenuOrganizer(
     MENU_CONTAINER_SELECTOR,
     VACANCY_SELECTOR
@@ -738,5 +754,5 @@ if (typeof chrome !== "undefined" && chrome.storage) {
 
 // Экспорт для тестов (в браузере module не определён)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { getVacancyData, HuntflowMenuOrganizer };
+  module.exports = { getVacancyData, HuntflowMenuOrganizer, sanitizeHTML, sanitizeText };
 }
