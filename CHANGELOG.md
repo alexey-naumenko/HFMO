@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/alexey-naumenko/HFMO/compare/v1.3.2...v1.3.3) (2026-05-05)
+
+### Исправления
+
+* event bubbling в drag & drop — двойной splice и коллапс меню ([a4c9196](https://github.com/alexey-naumenko/HFMO/commit/a4c9196e2f9ceae2d1752c24cf77f2c5792d516f)), closes [#10](https://github.com/alexey-naumenko/HFMO/issues/10) [#11](https://github.com/alexey-naumenko/HFMO/issues/11)
+* устранить все ESLint warnings ([d641b3c](https://github.com/alexey-naumenko/HFMO/commit/d641b3c0081a25a129fb2676888d4ae53c95c359))
+
 ## [1.3.2](https://github.com/alexey-naumenko/HFMO/compare/v1.3.1...v1.3.2) (2026-05-05)
 
 ### Исправления
