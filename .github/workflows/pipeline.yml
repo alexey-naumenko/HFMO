@@ -47,6 +47,20 @@ jobs:
             console.log('✓ manifest.json valid —', manifest.name, 'v' + manifest.version);
           "
 
+      - name: Check for Chrome-reserved directory names
+        run: |
+          # Chrome отказывается загружать расширение, если в корне есть
+          # директории с именем на _ (кроме _locales и _metadata)
+          reserved=$(find . -maxdepth 1 -type d -name '_*' \
+            ! -name '_locales' ! -name '_metadata' ! -name '.' | head -20)
+          if [ -n "$reserved" ]; then
+            echo "::error::Chrome-reserved directory names found:"
+            echo "$reserved"
+            echo "Rename these directories — Chrome will refuse to install the extension."
+            exit 1
+          fi
+          echo "  ✓ No reserved directory names"
+
       - name: Validate JS syntax
         run: node --check content.js
 
